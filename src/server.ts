@@ -1,6 +1,7 @@
 import * as dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
+import axios from 'axios';
 import { connectToDb } from "./database";
 import { shopCardsRouter } from "./employee.routes";
 import {
@@ -13,7 +14,6 @@ import {
 } from "./api";
 import paystackRouter from './paystack.route';
 
-import axios from "axios";
 
 const app = express();
 const PORT = 9000;
