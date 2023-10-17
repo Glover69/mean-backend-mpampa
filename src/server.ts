@@ -80,9 +80,9 @@ setInterval(async () => {
   }
 }, INTERVAL_MS);
 
-app.listen(PORT, () => {
-  console.log(`API Server is running on port ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`API Server is running on port ${PORT}`);
+// });
 
 dotenv.config();
 
@@ -100,9 +100,14 @@ connectToDb(ATLAS_URI)
     const app = express();
     app.use(cors());
 
-    app.use("/products", shopCardsRouter);
+    // app.use("/products", shopCardsRouter);
+    // app.listen(5200, () => {
+    //   console.log("Connected to http://localhost:5200...");
+    // });
+  })
+  .catch((error) => console.error(error));
+
+  app.use("/products", shopCardsRouter);
     app.listen(5200, () => {
       console.log("Connected to http://localhost:5200...");
     });
-  })
-  .catch((error) => console.error(error));
