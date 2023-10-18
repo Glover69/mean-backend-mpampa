@@ -1,7 +1,6 @@
 import * as mongodb from 'mongodb';
 
 export interface ShopCardsDetails {
-   
     productImg: string;
     subImages: string[];
     productName: string;
@@ -10,6 +9,14 @@ export interface ShopCardsDetails {
     productPrice: number;
     inStock: boolean;
     hasSizes: boolean;
+    productQuantity: number;
+    _id?: string | mongodb.ObjectId;
+}
+
+export interface cartProduct{
+    productImg: string;
+    productName: string;
+    productPrice: number;
     productQuantity: number;
     _id?: string | mongodb.ObjectId;
 }

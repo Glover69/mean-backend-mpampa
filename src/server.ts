@@ -4,6 +4,7 @@ import express from "express";
 import axios from 'axios';
 import { connectToDb } from "./database";
 import { shopCardsRouter } from "./employee.routes";
+import { cartProductsRouter } from "./employee.routes";
 import {
   SUBSCRIBER_KEY,
   xReferenceId,
@@ -107,7 +108,8 @@ connectToDb(ATLAS_URI)
   })
   .catch((error) => console.error(error));
 
-  app.use("/products", shopCardsRouter);
+  app.use("/products", shopCardsRouter),
+  app.use("/cart", cartProductsRouter),
     app.listen(5200, () => {
       console.log("Connected to http://localhost:5200...");
     });

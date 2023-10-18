@@ -5,24 +5,27 @@ import { PaystackResponse } from './employee';
 import { PaystackService } from "./paystack";
 
 export const shopCardsRouter = express.Router();
+export const cartProductsRouter = express.Router();
 shopCardsRouter.use(express.json());
+cartProductsRouter.use(express.json());
 
-// shopCardsRouter.post('/', async (req, res) => {
-//     try{
-//         const employee = req.body;
-//         const result = await collections.products.insertOne(employee);
+cartProductsRouter.post('/', async (req, res) => {
+    try{
+        const cart = req.body;
+        const result = await collections.cart.insertOne(cart);
+        
 
-//         if(result.acknowledged){
-//             res.status(201).send(`Created a new employee: ID ${result.insertedId}`);
-//         }else{
-//             res.status(500).send(`Failed to create a new employee`);
-//         }
-//     }
-//     catch(error){
-//         console.error(error);
-//         res.status(400).send(error.message)
-//     }
-// })
+        if(result.acknowledged){
+            res.status(201).send(`Added ${req.body.productName} to cart`);
+        }else{
+            res.status(500).send(`Failed to create a new employee`);
+        }
+    }
+    catch(error){
+        console.error(error);
+        res.status(400).send(error.message)
+    }
+})
 
 // Get all products
 shopCardsRouter.get('/', async (req, res) => {
