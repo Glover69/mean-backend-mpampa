@@ -22,6 +22,7 @@ export interface users{
 }
 
 export interface reviews{
+    rating: number;
     reviewMessage : string;
     photo: string;
     _id?: string | mongodb.ObjectId;
