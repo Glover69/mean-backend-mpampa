@@ -33,6 +33,18 @@ reviewsRouter.post('/', async (req, res) => {
     }
 })
 
+// Get all Reviews
+reviewsRouter.get('/', async (req, res) => {
+    try{
+        const reviews = await collections.reviews.find({}).toArray();
+        res.status(200).send(reviews);
+    }
+    catch(error){
+        console.error(error);
+        res.status(400).send(error.message)
+    }
+})
+
 // Request validation middleware
 // const validateLoginRequest = [
 //     body('emailAddress').isEmail(),
