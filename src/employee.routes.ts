@@ -3,29 +3,60 @@ import * as mongodb from "mongodb";
 import { collections } from "./database";
 import { PaystackResponse } from './employee';
 import { PaystackService } from "./paystack";
+import { Request, Response } from 'express';
+import bcrypt from "bcrypt";
+// const { body } = require('express-validator');
+import { users } from "./employee";
 
 export const shopCardsRouter = express.Router();
-export const cartProductsRouter = express.Router();
+export const usersRouter = express.Router();
+export const reviewsRouter = express.Router();
 shopCardsRouter.use(express.json());
-cartProductsRouter.use(express.json());
+usersRouter.use(express.json());
+reviewsRouter.use(express.json());
 
-cartProductsRouter.post('/', async (req, res) => {
+
+reviewsRouter.post('/', async (req, res) => {
     try{
-        const cart = req.body;
-        const result = await collections.cart.insertOne(cart);
-        
+        const reviews = req.body;
+        const result = await collections.reviews.insertOne(reviews);
 
         if(result.acknowledged){
-            res.status(201).send(`Added ${req.body.productName} to cart`);
+            res.status(201).send(`Added new review: ID ${result.insertedId}`)
         }else{
-            res.status(500).send(`Failed to create a new employee`);
+            res.status(500).send(`Failed to add review`);
         }
-    }
-    catch(error){
+
+    }catch(error){
         console.error(error);
         res.status(400).send(error.message)
     }
 })
+
+// Request validation middleware
+// const validateLoginRequest = [
+//     body('emailAddress').isEmail(),
+//     body('password').isLength({ min: 6 })
+//   ];
+
+// usersRouter.post('/', validateLoginRequest, async (req, res) => {
+//     try{
+//         const { emailAddress, password } = req.body;
+//         // const result = await collections.users.insertOne(users);
+        
+
+//         const user = await users.findOne({ emailAddress });
+//         if (user && await bcrypt.compare(password, user.password)) {
+//           res.json({ message: 'Login successful!' });
+//         } else {
+//           res.status(401).json({ message: 'Invalid credentials' });
+//         }
+//     }
+//     catch(error){
+//         console.error(error);
+//         res.status(400).send(error.message)
+//     }
+// })
 
 // Get all products
 shopCardsRouter.get('/', async (req, res) => {

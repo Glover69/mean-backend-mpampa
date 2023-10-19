@@ -13,11 +13,17 @@ export interface ShopCardsDetails {
     _id?: string | mongodb.ObjectId;
 }
 
-export interface cartProduct{
-    productImg: string;
-    productName: string;
-    productPrice: number;
-    productQuantity: number;
+export interface users{
+    // profileImage: string;
+    // userName: string;
+    emailAddress: number;
+    password: number;
+    _id?: string | mongodb.ObjectId;
+}
+
+export interface reviews{
+    reviewMessage : string;
+    photo: string;
     _id?: string | mongodb.ObjectId;
 }
 

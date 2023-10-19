@@ -3,8 +3,8 @@ import cors from "cors";
 import express from "express";
 import axios from 'axios';
 import { connectToDb } from "./database";
-import { shopCardsRouter } from "./employee.routes";
-import { cartProductsRouter } from "./employee.routes";
+import { reviewsRouter, shopCardsRouter } from "./employee.routes";
+// import { cartProductsRouter } from "./employee.routes";
 import {
   SUBSCRIBER_KEY,
   xReferenceId,
@@ -14,7 +14,7 @@ import {
   generateXRef,
 } from "./api";
 import paystackRouter from './paystack.route';
-
+// import authRoutes from './routes/auth.routes';
 
 const app = express();
 const PORT = 9000;
@@ -109,7 +109,9 @@ connectToDb(ATLAS_URI)
   .catch((error) => console.error(error));
 
   app.use("/products", shopCardsRouter),
-  app.use("/cart", cartProductsRouter),
+  app.use("/reviews", reviewsRouter),
+  // app.use("/cart", cartProductsRouter),
+  // app.use("/api", authRoutes),
     app.listen(5200, () => {
       console.log("Connected to http://localhost:5200...");
     });
