@@ -26,6 +26,7 @@ export interface reviews{
     reviewMessage : string;
     photo: string;
     _id?: string | mongodb.ObjectId;
+    reviewId: any;
 }
 
 // src/interfaces/paystack.interface.ts
