@@ -7,6 +7,9 @@ import { Request, Response } from 'express';
 import bcrypt from "bcrypt";
 // const { body } = require('express-validator');
 import { users } from "./employee";
+const { ObjectId } = require('mongodb');
+
+
 
 export const shopCardsRouter = express.Router();
 export const usersRouter = express.Router();
@@ -34,16 +37,34 @@ reviewsRouter.post('/', async (req, res) => {
 })
 
 // Get all Reviews
+// reviewsRouter.get('/', async (req, res) => {
+//     try{
+//         const reviews = await collections.reviews.find({}).toArray();
+//         res.status(200).send(reviews);
+//     }
+//     catch(error){
+//         console.error(error);
+//         res.status(400).send(error.message)
+//     }
+// })
+
 reviewsRouter.get('/', async (req, res) => {
-    try{
-        const reviews = await collections.reviews.find({}).toArray();
+    try {
+        const { reviewId } = req.query;
+        let filter = {}; // Default filter to get all reviews
+
+        // If reviewId is provided in the query parameters, add it to the filter
+        if (reviewId) {
+            filter = { reviewId: String(reviewId) }; // Assuming _id is the field in your reviews collection
+        }
+
+        const reviews = await collections.reviews.find(filter).toArray();
         res.status(200).send(reviews);
-    }
-    catch(error){
+    } catch (error) {
         console.error(error);
-        res.status(400).send(error.message)
+        res.status(500).send('Internal Server Error');
     }
-})
+});
 
 // Request validation middleware
 // const validateLoginRequest = [
