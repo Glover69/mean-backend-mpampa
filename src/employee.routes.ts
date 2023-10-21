@@ -8,9 +8,13 @@ import bcrypt from "bcrypt";
 // const { body } = require('express-validator');
 import { users } from "./employee";
 const { ObjectId } = require("mongodb");
-import User, { IUser } from './models/user.models';
-import jwt from 'jsonwebtoken';
-import multer from 'multer';
+import User, { IUser } from "./models/user.models";
+import jwt from "jsonwebtoken";
+import { S3 } from "aws-sdk";
+import multerS3 from "multer-s3";
+import AWS from "aws-sdk";
+import multer, { FileFilterCallback } from "multer";
+import { v4 as uuidv4 } from "uuid";
 
 export const shopCardsRouter = express.Router();
 export const usersRouter = express.Router();
@@ -19,46 +23,127 @@ shopCardsRouter.use(express.json());
 usersRouter.use(express.json());
 reviewsRouter.use(express.json());
 
+interface S3UploadResponse {
+  Location: string;
+  // Other properties from the S3 upload response can be added here if needed
+}
 
-
-const storage = multer.diskStorage({
-  destination: function (_req: any, _file: any, cb: (arg0: null, arg1: string) => void) {
-    cb(null, 'uploads/'); // Specify the folder where uploaded files will be stored
-  },
-  filename: function (_req: any, file: { originalname: string; }, cb: (arg0: null, arg1: string) => void) {
-    cb(null, Date.now() + '-' + file.originalname); // Generate unique filenames for uploaded files
-  },
+const s3 = new AWS.S3({
+  accessKeyId: "AKIAY7LT2367DS4FJUDX",
+  secretAccessKey: "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",
+  region: "eu-north-1",
 });
 
-const upload = multer({ storage: storage });
+// const upload = multer({
+//   storage: multerS3({
+//     acl: 'public-read',
+//     s3,
+//     bucket: 'awsmpampaimagebucket',
+//     key: function (req: Request, file: Express.Multer.File, cb: (error: Error | null, key?: string) => void) {
+//       const uniqueId = uuidv4(); // Generate a unique ID for the file
+//       const fileName = `${uniqueId}-${file.originalname}`;
+//       cb(null, fileName);
+//     },
+//   }),
+// });
 
-reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
-  try {
-    const { ratingValue, reviewMessage, reviewId } = req.body;
-    const photo = req.file ? req.file.path : null;
+const upload = multer({
+  storage: multer.memoryStorage(), // Store files in memory as Buffer objects
+});
 
-    const reviewData = {
-      ratingValue,
-      reviewMessage,
-      photo,
-      reviewId,
-    };
-    
-    const result = await collections.reviews.insertOne(reviewData);
+// const uploadMiddleware = upload.single('photo');
 
-    if (result.acknowledged) {
-      res.status(201).json({
-        message: "Added new review successfully",
-        review: reviewData, // Include the newly added review data in the response
-      });
-    } else {
-      res.status(500).send(`Failed to add review`);
+// API endpoint for posting reviews with image upload
+reviewsRouter.post(
+  "/",
+  upload.single("photo"),
+  async (req: Request, res: Response) => {
+    try {
+      const { ratingValue, reviewMessage, reviewId } = req.body;
+      const photo = req.file; // Use req.file.location to get the S3 URL
+
+      if (!photo) {
+        return res.status(400).send("No file uploaded.");
+      }
+
+      // Generate a unique file name using UUID
+      const fileName = `${uuidv4()}-${photo.originalname}`;
+
+      // Upload the file to S3
+      const params = {
+        Bucket: "awsmpampaimagebucket",
+        Key: fileName,
+        Body: photo.buffer,
+      };
+
+      const uploadResult = await s3.upload(params).promise();
+
+      // Get the S3 URL of the uploaded file
+      const photoUrl = uploadResult.Location;
+
+      const reviewData = {
+        ratingValue,
+        reviewMessage,
+        photo: photoUrl,
+        reviewId,
+      };
+
+      // const result = await collections.reviews.insertOne(reviewData);
+      const savedReview = await collections.reviews.insertOne(reviewData);
+
+      // Insert the reviewData into your database or perform necessary actions
+      // ...
+      if (savedReview.acknowledged) {
+        res.status(201).json({
+          message: "Added new review successfully",
+          review: reviewData, // Include the newly added review data in the response
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(400).send(error.message);
     }
-  } catch (error) {
-    console.error(error);
-    res.status(400).send(error.message);
   }
-});
+);
+
+// const storage = multer.diskStorage({
+//   destination: function(req, file, cb) {
+//     cb(null, 'uploads/'); // Make sure this path is correct
+//   },
+//   filename: function(req, file, cb) {
+//     cb(null, file.originalname);
+//   }
+// });
+
+// const upload = multer({ storage: storage });
+
+// reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
+//   try {
+//     const { ratingValue, reviewMessage, reviewId } = req.body;
+//     const photo = req.file ? req.file.path : null;
+
+//     const reviewData = {
+//       ratingValue,
+//       reviewMessage,
+//       photo,
+//       reviewId,
+//     };
+
+//     const result = await collections.reviews.insertOne(reviewData);
+
+//     if (result.acknowledged) {
+//       res.status(201).json({
+//         message: "Added new review successfully",
+//         review: reviewData, // Include the newly added review data in the response
+//       });
+//     } else {
+//       res.status(500).send(`Failed to add review`);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).send(error.message);
+//   }
+// });
 
 // To post reviews
 // reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
@@ -73,7 +158,7 @@ reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
 //       reviewId: ''
 //       // ...other review properties
 //     };
-    
+
 //     const result = await collections.reviews.insertOne(reviews);
 
 //     if (result.acknowledged) {
