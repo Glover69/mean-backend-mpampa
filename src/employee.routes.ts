@@ -10,6 +10,7 @@ import { users } from "./employee";
 const { ObjectId } = require("mongodb");
 import User, { IUser } from './models/user.models';
 import jwt from 'jsonwebtoken';
+import multer from 'multer';
 
 export const shopCardsRouter = express.Router();
 export const usersRouter = express.Router();
@@ -18,19 +19,32 @@ shopCardsRouter.use(express.json());
 usersRouter.use(express.json());
 reviewsRouter.use(express.json());
 
-const reviewData = {
-  ratingValue: 0,
-  ratingMessage: '',
-  photo: '',
-  reviewId: ''
-  // ...other review properties
-};
 
-// To post reviews
-reviewsRouter.post("/", async (req, res) => {
+
+const storage = multer.diskStorage({
+  destination: function (_req: any, _file: any, cb: (arg0: null, arg1: string) => void) {
+    cb(null, 'uploads/'); // Specify the folder where uploaded files will be stored
+  },
+  filename: function (_req: any, file: { originalname: string; }, cb: (arg0: null, arg1: string) => void) {
+    cb(null, Date.now() + '-' + file.originalname); // Generate unique filenames for uploaded files
+  },
+});
+
+const upload = multer({ storage: storage });
+
+reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
   try {
-    const reviews = req.body;
-    const result = await collections.reviews.insertOne(reviews);
+    const { ratingValue, reviewMessage } = req.body;
+    const photo = req.file ? req.file.path : null;
+
+    const reviewData = {
+      ratingValue,
+      reviewMessage,
+      photo,
+      reviewId: '',
+    };
+    
+    const result = await collections.reviews.insertOne(reviewData);
 
     if (result.acknowledged) {
       res.status(201).json({
@@ -45,6 +59,36 @@ reviewsRouter.post("/", async (req, res) => {
     res.status(400).send(error.message);
   }
 });
+
+// To post reviews
+// reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
+//   try {
+//     const reviews = req.body;
+//     const photo = req.file ? req.file.path : null;
+
+//     const reviewData = {
+//       ratingValue: 0,
+//       ratingMessage: '',
+//       photo: '',
+//       reviewId: ''
+//       // ...other review properties
+//     };
+    
+//     const result = await collections.reviews.insertOne(reviews);
+
+//     if (result.acknowledged) {
+//       res.status(201).json({
+//         message: "Added new review successfully",
+//         review: reviewData, // Include the newly added review data in the response
+//       });
+//     } else {
+//       res.status(500).send(`Failed to add review`);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(400).send(error.message);
+//   }
+// });
 
 // Get reviews by productId's
 reviewsRouter.get("/", async (req, res) => {
@@ -66,7 +110,7 @@ reviewsRouter.get("/", async (req, res) => {
 });
 
 // Get all products
-shopCardsRouter.get("/", async (req, res) => {
+shopCardsRouter.get("/", async (_req, res) => {
   try {
     const products = await collections.products.find({}).toArray();
     res.status(200).send(products);
