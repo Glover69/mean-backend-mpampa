@@ -14,7 +14,7 @@ import {
   generateXRef,
 } from "./api";
 import paystackRouter from './paystack.route';
-// import authRoutes from './routes/auth.routes';
+import authRoutes, { usersRouter } from './routes/auth.routes';
 
 const app = express();
 const PORT = 9000;
@@ -110,6 +110,7 @@ connectToDb(ATLAS_URI)
 
   app.use("/products", shopCardsRouter),
   app.use("/reviews", reviewsRouter),
+  app.use("/auth", usersRouter);
   // app.use("/cart", cartProductsRouter),
   // app.use("/api", authRoutes),
     app.listen(5200, () => {

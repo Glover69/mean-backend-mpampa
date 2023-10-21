@@ -1,17 +1,16 @@
-// // user.model.ts
-// import mongoose from 'mongoose';
-// require('dotenv').config(); // Load environment variables from .env file
 
-// mongoose.connect(process.env.ATLAS_URI, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true
-// });
 
-// const userSchema = new mongoose.Schema({
-//   email: { type: String, unique: true, required: true },
-//   password: { type: String, required: true },
-// });
+import mongoose, { Schema, Document } from 'mongoose';
 
-// const users = mongoose.model('users', userSchema);
+export interface IUser extends Document {
+  email: string;
+  password: string;
+}
 
-// export default users;
+const UserSchema: Schema = new Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+export default mongoose.model<IUser>('User', UserSchema);
+

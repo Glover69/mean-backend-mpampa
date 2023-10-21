@@ -8,6 +8,8 @@ import bcrypt from "bcrypt";
 // const { body } = require('express-validator');
 import { users } from "./employee";
 const { ObjectId } = require("mongodb");
+import User, { IUser } from './models/user.models';
+import jwt from 'jsonwebtoken';
 
 export const shopCardsRouter = express.Router();
 export const usersRouter = express.Router();
@@ -24,6 +26,7 @@ const reviewData = {
   // ...other review properties
 };
 
+// To post reviews
 reviewsRouter.post("/", async (req, res) => {
   try {
     const reviews = req.body;
@@ -43,18 +46,7 @@ reviewsRouter.post("/", async (req, res) => {
   }
 });
 
-// Get all Reviews
-// reviewsRouter.get('/', async (req, res) => {
-//     try{
-//         const reviews = await collections.reviews.find({}).toArray();
-//         res.status(200).send(reviews);
-//     }
-//     catch(error){
-//         console.error(error);
-//         res.status(400).send(error.message)
-//     }
-// })
-
+// Get reviews by productId's
 reviewsRouter.get("/", async (req, res) => {
   try {
     const { reviewId } = req.query;
@@ -72,30 +64,6 @@ reviewsRouter.get("/", async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
-
-// Request validation middleware
-// const validateLoginRequest = [
-//     body('emailAddress').isEmail(),
-//     body('password').isLength({ min: 6 })
-//   ];
-
-// usersRouter.post('/', validateLoginRequest, async (req, res) => {
-//     try{
-//         const { emailAddress, password } = req.body;
-//         // const result = await collections.users.insertOne(users);
-
-//         const user = await users.findOne({ emailAddress });
-//         if (user && await bcrypt.compare(password, user.password)) {
-//           res.json({ message: 'Login successful!' });
-//         } else {
-//           res.status(401).json({ message: 'Invalid credentials' });
-//         }
-//     }
-//     catch(error){
-//         console.error(error);
-//         res.status(400).send(error.message)
-//     }
-// })
 
 // Get all products
 shopCardsRouter.get("/", async (req, res) => {
@@ -138,5 +106,35 @@ router.post("/initiate-payment", async (req, res) => {
   );
   res.json(paymentResponse);
 });
+
+// router.post('/signup', async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const hashedPassword = await bcrypt.hash(password, 10);
+//     const user = new User({ email, password: hashedPassword });
+//     await user.save();
+//     res.status(201).json({ message: 'User created successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: 'Signup failed' });
+//   }
+// });
+
+// router.post('/login', async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+//     const user: IUser | null = await User.findOne({ email });
+//     if (!user) {
+//       return res.status(401).json({ message: 'Authentication failed' });
+//     }
+//     const isValidPassword = await bcrypt.compare(password, user.password);
+//     if (!isValidPassword) {
+//       return res.status(401).json({ message: 'Authentication failed' });
+//     }
+//     const token = jwt.sign({ email: user.email, userId: user._id }, 'your_secret_key', { expiresIn: '1h' });
+//     res.status(200).json({ token, expiresIn: 3600 }); // Token expires in 1 hour
+//   } catch (error) {
+//     res.status(500).json({ message: 'Login failed' });
+//   }
+// });
 
 export default router;

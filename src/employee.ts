@@ -14,10 +14,8 @@ export interface ShopCardsDetails {
 }
 
 export interface users{
-    // profileImage: string;
-    // userName: string;
-    emailAddress: number;
-    password: number;
+    email: string;
+    password: string;
     _id?: string | mongodb.ObjectId;
 }
 
