@@ -34,14 +34,14 @@ const upload = multer({ storage: storage });
 
 reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
   try {
-    const { ratingValue, reviewMessage } = req.body;
+    const { ratingValue, reviewMessage, reviewId } = req.body;
     const photo = req.file ? req.file.path : null;
 
     const reviewData = {
       ratingValue,
       reviewMessage,
       photo,
-      reviewId: '',
+      reviewId,
     };
     
     const result = await collections.reviews.insertOne(reviewData);
