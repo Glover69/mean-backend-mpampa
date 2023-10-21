@@ -25,5 +25,3 @@ export async function connectToDb(uri: string) {
   const reviewsCollection = db.collection<reviews>("reviews");
   collections.reviews = reviewsCollection;
 }
-
-// YWZmcolpJQmnUZdT

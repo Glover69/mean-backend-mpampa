@@ -4,7 +4,6 @@ import express from "express";
 import axios from 'axios';
 import { connectToDb } from "./database";
 import { reviewsRouter, shopCardsRouter } from "./employee.routes";
-// import { cartProductsRouter } from "./employee.routes";
 import {
   SUBSCRIBER_KEY,
   xReferenceId,
@@ -81,10 +80,6 @@ setInterval(async () => {
   }
 }, INTERVAL_MS);
 
-// app.listen(PORT, () => {
-//   console.log(`API Server is running on port ${PORT}`);
-// });
-
 dotenv.config();
 
 const { ATLAS_URI } = process.env;
@@ -101,18 +96,12 @@ connectToDb(ATLAS_URI)
     const app = express();
     app.use(cors());
 
-    // app.use("/products", shopCardsRouter);
-    // app.listen(5200, () => {
-    //   console.log("Connected to http://localhost:5200...");
-    // });
   })
   .catch((error) => console.error(error));
 
   app.use("/products", shopCardsRouter),
   app.use("/reviews", reviewsRouter),
   app.use("/auth", usersRouter);
-  // app.use("/cart", cartProductsRouter),
-  // app.use("/api", authRoutes),
     app.listen(5200, () => {
       console.log("Connected to http://localhost:5200...");
     });
