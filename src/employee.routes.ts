@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as mongodb from "mongodb";
-import { collections } from "./database";
+import { collections } from "./database.js";
 import { PaystackResponse } from "./employee";
 import { PaystackService } from "./paystack";
 import { Request, Response } from "express";
