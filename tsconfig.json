@@ -13,5 +13,27 @@
             "*": ["node_modules/*"]
         }
     },
-    "include": ["src/**/*.ts"]
+    "include": ["src/**/*.ts"],
+    "exclude": ["node_modules"]
 }
+
+// {
+//   "compilerOptions": {
+//     "target": "ESNext",
+//     "module": "CommonJS",
+//     "strict": true,
+//     "esModuleInterop": true,
+//     "skipLibCheck": true,
+//     "forceConsistentCasingInFileNames": true,
+//     "outDir": "./dist",
+//     "baseUrl": "./",
+//     "allowJs": true,
+//     "resolveJsonModule": true,
+//     "rootDir": "./",
+//     "paths": {
+//       "*": ["node_modules/*", "src/types/*"]
+//     }
+//   },
+//   "include": ["src/**/*.ts", "src/**/*.d.ts"],
+//   "exclude": ["node_modules"]
+// }
