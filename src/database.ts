@@ -1,6 +1,7 @@
 import * as mongodb from "mongodb";
 import { ShopCardsDetails, reviews, users } from "./employee";
 
+
 export const collections: {
     products?: mongodb.Collection<ShopCardsDetails>;
     users?: mongodb.Collection<users>;
