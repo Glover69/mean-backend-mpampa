@@ -93,7 +93,7 @@ reviewsRouter.get("/", async (req, res) => {
 
     // If reviewId is provided in the query parameters, add it to the filter
     if (reviewId) {
-      filter = { reviewId: String(reviewId) }; // Assuming _id is the field in your reviews collection
+      filter = { reviewId: String(reviewId) };
     }
 
     const reviews = await collections.reviews.find(filter).toArray();
@@ -111,7 +111,7 @@ shopCardsRouter.get("/", async (_req, res) => {
     res.status(200).send(products);
   } catch (error) {
     console.error(error);
-    res.status(400).send(error.message);
+    res.status(400).send("Error: " + error.message);
   }
 });
 
