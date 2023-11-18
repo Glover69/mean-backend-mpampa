@@ -1,6 +1,7 @@
 import * as mongodb from "mongodb";
 import { ShopCardsDetails, reviews, users } from "./employee";
 
+
 export const collections: {
     products?: mongodb.Collection<ShopCardsDetails>;
     users?: mongodb.Collection<users>;
@@ -25,5 +26,3 @@ export async function connectToDb(uri: string) {
   const reviewsCollection = db.collection<reviews>("reviews");
   collections.reviews = reviewsCollection;
 }
-
-// YWZmcolpJQmnUZdT

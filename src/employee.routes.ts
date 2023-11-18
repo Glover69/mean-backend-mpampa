@@ -8,9 +8,11 @@ import bcrypt from "bcrypt";
 // const { body } = require('express-validator');
 import { users } from "./employee";
 const { ObjectId } = require("mongodb");
-import User, { IUser } from './models/user.models';
-import jwt from 'jsonwebtoken';
-import multer from 'multer';
+import User, { IUser } from "./models/user.models";
+import jwt from "jsonwebtoken";
+import AWS from "aws-sdk";
+import multer, { FileFilterCallback } from "multer";
+import { v4 as uuidv4 } from "uuid";
 
 export const shopCardsRouter = express.Router();
 export const usersRouter = express.Router();
@@ -19,76 +21,69 @@ shopCardsRouter.use(express.json());
 usersRouter.use(express.json());
 reviewsRouter.use(express.json());
 
-
-
-const storage = multer.diskStorage({
-  destination: function (_req: any, _file: any, cb: (arg0: null, arg1: string) => void) {
-    cb(null, 'uploads/'); // Specify the folder where uploaded files will be stored
-  },
-  filename: function (_req: any, file: { originalname: string; }, cb: (arg0: null, arg1: string) => void) {
-    cb(null, Date.now() + '-' + file.originalname); // Generate unique filenames for uploaded files
-  },
+const s3 = new AWS.S3({
+  accessKeyId: "AKIAY7LT2367DS4FJUDX",
+  secretAccessKey: "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",
+  region: "eu-north-1",
 });
 
-const upload = multer({ storage: storage });
 
-reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
-  try {
-    const { ratingValue, reviewMessage, reviewId } = req.body;
-    const photo = req.file ? req.file.path : null;
+const upload = multer({
+  storage: multer.memoryStorage(), // Store files in memory as Buffer objects
+});
 
-    const reviewData = {
-      ratingValue,
-      reviewMessage,
-      photo,
-      reviewId,
-    };
-    
-    const result = await collections.reviews.insertOne(reviewData);
+// API endpoint for posting reviews with image upload
+reviewsRouter.post(
+  "/",
+  upload.single("photo"),
+  async (req: Request, res: Response) => {
+    try {
+      const { ratingValue, reviewMessage, reviewId } = req.body;
+      const photo = req.file; // Use req.file.location to get the S3 URL
 
-    if (result.acknowledged) {
-      res.status(201).json({
-        message: "Added new review successfully",
-        review: reviewData, // Include the newly added review data in the response
-      });
-    } else {
-      res.status(500).send(`Failed to add review`);
+      if (!photo) {
+        return res.status(400).send("No file uploaded.");
+      }
+
+      // Generate a unique file name using UUID
+      const fileName = `${uuidv4()}-${photo.originalname}`;
+
+      // Upload the file to S3
+      const params = {
+        Bucket: "awsmpampaimagebucket",
+        Key: fileName,
+        Body: photo.buffer,
+      };
+
+      const uploadResult = await s3.upload(params).promise();
+
+      // Get the S3 URL of the uploaded file
+      const photoUrl = uploadResult.Location;
+
+      const reviewData = {
+        ratingValue,
+        reviewMessage,
+        photo: photoUrl,
+        reviewId,
+      };
+
+      // const result = await collections.reviews.insertOne(reviewData);
+      const savedReview = await collections.reviews.insertOne(reviewData);
+
+      // Insert the reviewData into your database or perform necessary actions
+      // ...
+      if (savedReview.acknowledged) {
+        res.status(201).json({
+          message: "Added new review successfully",
+          review: reviewData, // Include the newly added review data in the response
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(400).send(error.message);
     }
-  } catch (error) {
-    console.error(error);
-    res.status(400).send(error.message);
   }
-});
-
-// To post reviews
-// reviewsRouter.post("/", upload.single('photo'), async (req, res) => {
-//   try {
-//     const reviews = req.body;
-//     const photo = req.file ? req.file.path : null;
-
-//     const reviewData = {
-//       ratingValue: 0,
-//       ratingMessage: '',
-//       photo: '',
-//       reviewId: ''
-//       // ...other review properties
-//     };
-    
-//     const result = await collections.reviews.insertOne(reviews);
-
-//     if (result.acknowledged) {
-//       res.status(201).json({
-//         message: "Added new review successfully",
-//         review: reviewData, // Include the newly added review data in the response
-//       });
-//     } else {
-//       res.status(500).send(`Failed to add review`);
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(400).send(error.message);
-//   }
-// });
+);
 
 // Get reviews by productId's
 reviewsRouter.get("/", async (req, res) => {
