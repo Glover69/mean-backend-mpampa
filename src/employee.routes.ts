@@ -212,20 +212,14 @@ shopCardsRouter.get("/", async (_req, res) => {
 
 // Get all reviews
 reviewsRouter.get("/", async (_req, res) => {
-  // try {
-    if(collections && collections.products){
-      console.log('Collection for products exits');
-      const reviewData = await collections.reviews.find({}).toArray();
-      res.status(200).send(reviewData);
-    }else{
-      console.log('Collection for products doesnt exist')
-    }
+  try {
     // const { products } = await connectToDb();
-    
-  // } catch (error) {
-  //   console.error(error);
-  //   res.status(400).send(error.message);
-  // }
+    const reviewData = await collections.reviews.find({}).toArray();
+    res.status(200).send(reviewData);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send(error.message);
+  }
 });
 
 // Get products by id
