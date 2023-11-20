@@ -177,24 +177,24 @@ reviewsRouter.post(
 // });
 
 // Get reviews by productId's
-reviewsRouter.get("/", async (req, res) => {
-  try {
-    // const { reviews } = await connectToDb();
-    const { reviewId } = req.query;
-    let filter = {}; // Default filter to get all reviews
+// reviewsRouter.get("/", async (req, res) => {
+//   try {
+//     // const { reviews } = await connectToDb();
+//     const { reviewId } = req.query;
+//     let filter = {}; // Default filter to get all reviews
 
-    // If reviewId is provided in the query parameters, add it to the filter
-    if (reviewId) {
-      filter = { reviewId: String(reviewId) }; // Assuming _id is the field in your reviews collection
-    }
+//     // If reviewId is provided in the query parameters, add it to the filter
+//     if (reviewId) {
+//       filter = { reviewId: String(reviewId) }; // Assuming _id is the field in your reviews collection
+//     }
 
-    const reviewsData = await collections.reviews.find(filter).toArray();
-    res.status(200).send(reviewsData);
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Internal Server Error");
-  }
-});
+//     const reviewsData = await collections.reviews.find(filter).toArray();
+//     res.status(200).send(reviewsData);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
 
 // Get all products
 shopCardsRouter.get("/", async (_req, res) => {
@@ -202,6 +202,18 @@ shopCardsRouter.get("/", async (_req, res) => {
     // const { products } = await connectToDb();
     const productsData = await collections.products.find({}).toArray();
     res.status(200).send(productsData);
+  } catch (error) {
+    console.error(error);
+    res.status(400).send(error.message);
+  }
+});
+
+// Get all reviews
+reviewsRouter.get("/", async (_req, res) => {
+  try {
+    // const { products } = await connectToDb();
+    const reviewData = await collections.reviews.find({}).toArray();
+    res.status(200).send(reviewData);
   } catch (error) {
     console.error(error);
     res.status(400).send(error.message);
