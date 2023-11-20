@@ -1,7 +1,11 @@
 import * as mongodb from "mongodb";
+import express from "express";
+const app = express();
+
 import { ShopCardsDetails, reviews, users } from "./employee";
 import { Collection } from "mongodb";
 
+app.use(express.json());
 export let collections: {
   products: Collection<ShopCardsDetails>;
   users: Collection<users>;
