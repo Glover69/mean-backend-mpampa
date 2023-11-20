@@ -3,7 +3,7 @@ import express from "express";
 const app = express();
 
 import { ShopCardsDetails, reviews, users } from "./employee";
-import { Collection } from "mongodb";
+import { Collection, MongoClient } from "mongodb";
 
 app.use(express.json());
 export let collections: {
@@ -26,6 +26,7 @@ collections = {
   users: db.collection<users>('users'),
   reviews: db.collection<reviews>('reviews'),
 };
+
 
   // const shopCardsCollection = db.collection<ShopCardsDetails>("products");
   // collections.products = shopCardsCollection;
@@ -67,5 +68,41 @@ collections = {
 //     throw error;
 //   }
 // };
+
+// export default connectToDb;
+
+// import { MongoClient, Collection } from 'mongodb';
+
+// // Replace these connection details with your own
+// const uri = process.env.ATLAS_URI!;
+// const client = new MongoClient(uri);
+
+// let collections: {
+//   products: Collection<ShopCardsDetails>;
+//   users: Collection<users>;
+//   reviews: Collection<reviews>;
+// };
+
+// async function connectToDb() {
+//   try {
+//     await client.connect();
+//     console.log('Connected to the database');
+
+//     // Specify your database and collections
+//     const database = client.db('mpampaWebsite');
+//     collections = {
+//       products: database.collection<ShopCardsDetails>('products'),
+//       users: database.collection<users>('users'),
+//       reviews: database.collection<reviews>('reviews'),
+//     };
+//   } catch (error) {
+//     console.error('Error connecting to the database:', error);
+//   }
+// }
+
+// // Call connectToDb to establish the connection and initialize collections
+// connectToDb();
+
+// export { collections };
 
 // export default connectToDb;

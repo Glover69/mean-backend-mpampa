@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as mongodb from "mongodb";
-import {collections, connectToDb} from "./database";
+import {collections} from "./database";
+import {connectToDb} from "./database";
 import { PaystackResponse } from "./employee";
 import { PaystackService } from "./paystack";
 import { Request, Response } from "express";
@@ -199,7 +200,8 @@ reviewsRouter.post(
 // Get all products
 shopCardsRouter.get("/", async (_req, res) => {
   try {
-    // const { products } = await connectToDb();
+        // const { products } = await connectToDb();
+    // const collection = await db.collections.products("products");
     const productsData = await collections.products.find({}).toArray();
     res.status(200).send(productsData);
   } catch (error) {
@@ -211,9 +213,15 @@ shopCardsRouter.get("/", async (_req, res) => {
 // Get all reviews
 reviewsRouter.get("/", async (_req, res) => {
   try {
+    if(collections && collections.products){
+      console.log('Collection for products exits');
+      const reviewData = await collections.reviews.find({}).toArray();
+      res.status(200).send(reviewData);
+    }else{
+      console.log('Collection for products doesnt exist');
+    }
     // const { products } = await connectToDb();
-    const reviewData = await collections.reviews.find({}).toArray();
-    res.status(200).send(reviewData);
+    
   } catch (error) {
     console.error(error);
     res.status(400).send(error.message);
