@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
 import axios from 'axios';
-import { connectToDb } from "./database";
+import {connectToDb} from "./database";
 import { reviewsRouter, shopCardsRouter } from "./employee.routes";
 // import { cartProductsRouter } from "./employee.routes";
 import {

@@ -1,6 +1,6 @@
 import * as express from "express";
 import * as mongodb from "mongodb";
-import { collections } from "./database";
+import {collections, connectToDb} from "./database";
 import { PaystackResponse } from "./employee";
 import { PaystackService } from "./paystack";
 import { Request, Response } from "express";
@@ -59,6 +59,7 @@ reviewsRouter.post(
   upload.single("photo"),
   async (req: Request, res: Response) => {
     try {
+      // const { reviews } = await connectToDb();
       const { ratingValue, reviewMessage, reviewId } = req.body;
       const photo = req.file; // Use req.file.location to get the S3 URL
 
@@ -178,6 +179,7 @@ reviewsRouter.post(
 // Get reviews by productId's
 reviewsRouter.get("/", async (req, res) => {
   try {
+    // const { reviews } = await connectToDb();
     const { reviewId } = req.query;
     let filter = {}; // Default filter to get all reviews
 
@@ -186,8 +188,8 @@ reviewsRouter.get("/", async (req, res) => {
       filter = { reviewId: String(reviewId) }; // Assuming _id is the field in your reviews collection
     }
 
-    const reviews = await collections.reviews.find(filter).toArray();
-    res.status(200).send(reviews);
+    const reviewsData = await collections.reviews.find(filter).toArray();
+    res.status(200).send(reviewsData);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -197,8 +199,9 @@ reviewsRouter.get("/", async (req, res) => {
 // Get all products
 shopCardsRouter.get("/", async (_req, res) => {
   try {
-    const products = await collections.products.find({}).toArray();
-    res.status(200).send(products);
+    // const { products } = await connectToDb();
+    const productsData = await collections.products.find({}).toArray();
+    res.status(200).send(productsData);
   } catch (error) {
     console.error(error);
     res.status(400).send(error.message);
@@ -208,12 +211,13 @@ shopCardsRouter.get("/", async (_req, res) => {
 // Get products by id
 shopCardsRouter.get("/:id", async (req, res) => {
   try {
+    // const { products } = await connectToDb();
     const id = req?.params?.id;
     const query = { _id: id };
-    const products = await collections.products.findOne(query);
+    const productsDetail = await collections.products.findOne(query);
 
-    if (products) {
-      res.status(200).send(products);
+    if (productsDetail) {
+      res.status(200).send(productsDetail);
     } else {
       res.status(404).send(`Failed to find ${id}`);
     }
