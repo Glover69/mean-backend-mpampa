@@ -202,11 +202,11 @@ shopCardsRouter.get("/", async (_req, res) => {
   try {
         // const { products } = await connectToDb();
     // const collection = await db.collections.products("products");
-    const productsData = await collections.products.find({}).toArray();
+    const productsData = await collections.products.find().toArray();
     res.status(200).send(productsData);
   } catch (error) {
-    console.error(error);
-    res.status(400).send(error.message);
+    console.error('Error fetching users:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 });
 

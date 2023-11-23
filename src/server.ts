@@ -1,8 +1,8 @@
 import * as dotenv from "dotenv";
 import cors from "cors";
 import express from "express";
-import axios from 'axios';
-import {connectToDb} from "./database";
+import axios from "axios";
+import { connectToDb } from "./database";
 import { reviewsRouter, shopCardsRouter } from "./employee.routes";
 // import { cartProductsRouter } from "./employee.routes";
 import {
@@ -13,16 +13,15 @@ import {
   generateAccessToken,
   generateXRef,
 } from "./api";
-import paystackRouter from './paystack.route';
-import authRoutes, { usersRouter } from './routes/auth.routes';
+import paystackRouter from "./paystack.route";
+import authRoutes, { usersRouter } from "./routes/auth.routes";
 
 const app = express();
-const PORT = 9000;
 
 app.use(express.json());
 app.use(cors());
 
-app.use('/paystack', paystackRouter);
+app.use("/paystack", paystackRouter);
 
 app.post("/request-to-pay", async (req, res) => {
   try {
@@ -81,7 +80,6 @@ setInterval(async () => {
   }
 }, INTERVAL_MS);
 
-
 dotenv.config();
 
 const { ATLAS_URI } = process.env;
@@ -100,9 +98,12 @@ connectToDb(ATLAS_URI)
   })
   .catch((error) => console.error(error));
 
-  app.use("/products", shopCardsRouter),
-  app.use("/reviews", reviewsRouter),
-  app.use("/auth", usersRouter);
-    app.listen(5200, () => {
-      console.log("Connected to http://localhost:5200...");
-    });
+const PORT = process.env.PORT || 5200;
+
+app.use("/products", shopCardsRouter),
+app.use("/reviews", reviewsRouter),
+app.use("/auth", usersRouter);
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
