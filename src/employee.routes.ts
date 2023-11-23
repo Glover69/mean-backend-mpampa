@@ -16,6 +16,7 @@ import multerS3 from "multer-s3";
 import AWS from "aws-sdk";
 import multer, { FileFilterCallback } from "multer";
 import { v4 as uuidv4 } from "uuid";
+import { ShopCardsDetailsModel } from "./models/products.models";
 
 export const shopCardsRouter = express.Router();
 export const usersRouter = express.Router();
@@ -198,12 +199,22 @@ reviewsRouter.post(
 // });
 
 // Get all products
+// shopCardsRouter.get("/", async (_req, res) => {
+//   try {
+//         // const { products } = await connectToDb();
+//     // const collection = await db.collections.products("products");
+//     const productsData = await collections.products.find().toArray();
+//     res.status(200).send(productsData);
+//   } catch (error) {
+//     console.error('Error fetching users:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// });
+
 shopCardsRouter.get("/", async (_req, res) => {
   try {
-        // const { products } = await connectToDb();
-    // const collection = await db.collections.products("products");
-    const productsData = await collections.products.find().toArray();
-    res.status(200).send(productsData);
+    const products = await collections.products.find().toArray();
+    res.status(200).send(products);
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Internal Server Error' });
